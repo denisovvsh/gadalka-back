@@ -1,23 +1,14 @@
 import mongoose from "mongoose";
 
 const UserSchema = new mongoose.Schema({
-    email: {
+    telegramId: {
         type: String,
-        required: true,
-        unique: true    
+        required: true
     },
-    password: {
-        type: String,
-        required: true,
-    },
-    name: {
-        type: String,
-        required: true,
-    },
-    role: {
-        type: String,
-        default: "user"
-    },
+    subscribe: {
+        type: Boolean,
+        default: false
+    }
 }, {
     timestamps: true,
 });

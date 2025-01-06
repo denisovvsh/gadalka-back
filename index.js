@@ -59,6 +59,7 @@ const upload = multer({ storage: storage })
 
 app.post('/register', UserController.register)
 app.post('/login', UserController.login)
+app.post('/getTelegramId', UserController.getTelegramId)
 
 
 // Orders
