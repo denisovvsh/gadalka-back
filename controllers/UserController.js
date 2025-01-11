@@ -5,32 +5,30 @@ import User from '../models/User.js'; // Убедитесь, что путь п�
 
 export const register = async (req, res) => {
   try {
-    // Хэширование пароля
-    const salt = await bcrypt.genSalt(10); // Генерация соли
-    const hashedPassword = await bcrypt.hash(req.body.password, salt); // Хэширование пароля
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(req.body.password, salt);
 
-    // Создание нового пользователя
     const newUser = new User({
       email: req.body.email,
       name: req.body.name,
-      password: hashedPassword, // Используем хэшированный пароль
-      role: req.body.role
+      password: hashedPassword,
+      role: req.body.role,
     });
 
-    // Сохранение пользователя в базе данных
     const savedUser = await newUser.save();
 
-    // Генерация токена
     const token = jwt.sign({ _id: savedUser._id }, 'secret123', { expiresIn: '30d' });
 
-    // Ответ клиенту
     res.json({ token, ...savedUser._doc });
-
   } catch (err) {
+    if (err.code === 11000) {
+      return res.status(400).json({ message: 'Пользователь с таким email уже существует.' });
+    }
     console.error(err);
     res.status(500).json({ message: 'Не удалось зарегистрироваться' });
   }
 };
+
 
 
 export const login = async (req, res) => {
@@ -60,6 +58,28 @@ export const login = async (req, res) => {
       res.status(500).json({ message: 'Не удалось войти в аккаунт' });
     }
   };
+
+  export const getUserById = async (req, res) => {
+    try {
+      const userId = req.params.id; // Получаем id из параметров запроса
+  
+      // Ищем пользователя по id в базе данных
+      const user = await User.findById(userId);
+  
+      // Если пользователь не найден
+      if (!user) {
+        return res.status(404).json({ message: 'Пользователь не найден' });
+      }
+  
+      // Возвращаем данные пользователя без пароля
+      const { password, ...userData } = user._doc;
+      res.json(userData);
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ message: 'Не удалось получить данные пользователя' });
+    }
+  };
+  
 
 
 
