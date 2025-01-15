@@ -12,6 +12,7 @@ const UserSchema = new mongoose.Schema({
         type: String,
         default: "user"
     },
+    date: String,
     results: [String]
 }, {
     timestamps: true,

@@ -83,27 +83,38 @@ export const login = async (req, res) => {
 
 
 
-// export const updateUserInfo = async (req, res) => {
-//   try {
-//     const userId = req.params.id; 
-//     const { city, country, job, oblast } = req.body;
-
-//     const updatedUser = await User.findByIdAndUpdate(
-//       userId,
-//       { city, country, job, oblast }, // Обновляемые поля
-//       { new: true } // Возвращаем обновленный объект
-//     );
-
-//     if (!updatedUser) {
-//       return res.status(404).json({ message: 'Пользователь не найден' });
-//     }
-
-//     res.json({ message: 'Информация обновлена', user: updatedUser });
-//   } catch (err) {
-//     console.error(err);
-//     res.status(500).json({ message: 'Не удалось обновить информацию' });
-//   }
-// };
+  export const updateUserInfo = async (req, res) => {
+    try {
+      const userId = req.params.id;
+      const { date, date1, date2 } = req.body;
+  
+      // Формируем объект с обновляемыми полями
+      const updates = {};
+      if (date) updates.date = date;
+      if (date1) updates.date1 = date1;
+      if (date2) updates.date2 = date2;
+  
+      if (Object.keys(updates).length === 0) {
+        return res.status(400).json({ message: 'Нет данных для обновления' });
+      }
+  
+      const updatedUser = await User.findByIdAndUpdate(
+        userId,
+        updates, // Обновляемые поля
+        { new: true } // Возвращаем обновленный объект
+      );
+  
+      if (!updatedUser) {
+        return res.status(404).json({ message: 'Пользователь не найден' });
+      }
+  
+      res.json({ message: 'Информация обновлена', user: updatedUser });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ message: 'Не удалось обновить информацию' });
+    }
+  };
+  
 
 export const getTelegramId = async (req, res) => {
   const initData = req.body.initData;
