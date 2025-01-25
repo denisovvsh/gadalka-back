@@ -13,6 +13,9 @@ const UserSchema = new mongoose.Schema({
         default: "user"
     },
     date: String,
+    date1: String,
+    date2: String,
+    tab: String,
     results: [String]
 }, {
     timestamps: true,

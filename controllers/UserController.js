@@ -86,14 +86,17 @@ export const login = async (req, res) => {
   export const updateUserInfo = async (req, res) => {
     try {
       const userId = req.params.id;
-      const { date, date1, date2 } = req.body;
+      const { date, date1, date2, tab } = req.body;
   
       // Формируем объект с обновляемыми полями
       const updates = {};
       if (date) updates.date = date;
       if (date1) updates.date1 = date1;
       if (date2) updates.date2 = date2;
-  
+      if (tab) updates.tab = tab;
+      
+      console.log(date1, date2);
+      
       if (Object.keys(updates).length === 0) {
         return res.status(400).json({ message: 'Нет данных для обновления' });
       }
