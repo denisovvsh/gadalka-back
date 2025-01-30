@@ -35,6 +35,7 @@ app.post('/register', UserController.register)
 app.post('/login', UserController.login)
 app.get('/getUserById/:id', UserController.getUserById)
 app.post('/updateDate/:id', UserController.updateUserInfo)
+app.post('/resetPassword', UserController.resetPassword)
 
 
 const port = process.env.PORT || 3001

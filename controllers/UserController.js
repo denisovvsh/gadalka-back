@@ -1,7 +1,8 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-
+import nodemailer from 'nodemailer'
 import User from '../models/User.js'; // Убедитесь, что путь правильный
+import crypto from 'crypto';
 
 export const register = async (req, res) => {
   try {
@@ -19,6 +20,32 @@ export const register = async (req, res) => {
 
     const token = jwt.sign({ _id: savedUser._id }, 'secret123', { expiresIn: '30d' });
 
+    // Настройка транспортера для отправки email
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: 'info@1matrica-sudby.ru',
+        pass: 'zevv ocdh wcow uypn',
+      },
+    });
+    console.log('N7:Jm\eX=%P4ghZ')
+
+    // Настройка письма
+    const mailOptions = {
+      from: 'info@1matrica-sudby.ru',
+      to: req.body.email,
+      subject: 'Успешная регистрация',
+      text: `Здравствуйте, ${req.body.name}!
+
+Вы успешно зарегистрировались на нашем сайте.
+
+С уважением,
+Команда поддержки.`,
+    };
+
+    // Отправка письма
+    await transporter.sendMail(mailOptions);
+
     res.json({ token, ...savedUser._doc });
   } catch (err) {
     if (err.code === 11000) {
@@ -29,6 +56,60 @@ export const register = async (req, res) => {
   }
 };
 
+
+export const resetPassword = async (req, res) => {
+  const { email } = req.body; // Получаем email из запроса
+
+  try {
+    // Находим пользователя по email
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ message: 'Пользователь с таким email не найден' });
+    }
+
+    // Генерация случайного нового пароля
+    const newPassword = crypto.randomBytes(8).toString('hex'); // Генерируем случайный пароль длиной 16 символов
+
+    // Хэшируем новый пароль
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+    // Обновляем пароль в базе данных
+    user.password = hashedPassword;
+    await user.save();
+
+    // Настройка транспортера для отправки email
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: 'info@1matrica-sudby.ru',
+        pass: 'zevv ocdh wcow uypn',
+      },
+    });
+
+    // Настройка письма
+    const mailOptions = {
+      from: 'info@1matrica-sudby.ru',
+      to: email,
+      subject: 'Восстановление пароля',
+      text: `Здравствуйте!
+
+Ваш новый пароль для входа на наш сайт: ${newPassword}
+
+С уважением,
+Команда поддержки.`,
+    };
+
+    // Отправка письма
+    await transporter.sendMail(mailOptions);
+
+    res.json({ message: 'Новый пароль отправлен на ваш email' });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Ошибка при сбросе пароля' });
+  }
+};
 
 
 export const login = async (req, res) => {
