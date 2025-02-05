@@ -16,7 +16,12 @@ const UserSchema = new mongoose.Schema({
     date1: String,
     date2: String,
     tab: String,
-    results: [String]
+    results: [String],
+    subscribe: {
+        type: Boolean,
+        default: false
+    },
+    subscribeDate: String
 }, {
     timestamps: true,
 });

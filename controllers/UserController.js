@@ -14,6 +14,8 @@ export const register = async (req, res) => {
       name: req.body.name,
       password: hashedPassword,
       role: req.body.role,
+      subscribe: true, // Подписка включена по умолчанию
+      subscribeDate: new Date(), // Устанавливаем текущую дату подписки
     });
 
     const savedUser = await newUser.save();
@@ -28,7 +30,6 @@ export const register = async (req, res) => {
         pass: 'zevv ocdh wcow uypn',
       },
     });
-    console.log('N7:Jm\eX=%P4ghZ')
 
     // Настройка письма
     const mailOptions = {
@@ -37,7 +38,9 @@ export const register = async (req, res) => {
       subject: 'Успешная регистрация',
       text: `Здравствуйте, ${req.body.name}!
 
-Вы успешно зарегистрировались на нашем сайте.
+Вы успешно зарегистрировались на нашем сайте. 
+
+Ваша подписка активирована с ${new Date().toLocaleDateString()}.
 
 С уважением,
 Команда поддержки.`,
@@ -55,6 +58,7 @@ export const register = async (req, res) => {
     res.status(500).json({ message: 'Не удалось зарегистрироваться' });
   }
 };
+
 
 
 export const resetPassword = async (req, res) => {
@@ -241,5 +245,36 @@ export const getTelegramId = async (req, res) => {
   } catch (error) {
     console.error('Ошибка при обработке данных:', error);
     return res.status(500).json({ error: 'Ошибка при обработке initData.' });
+  }
+};
+
+export const updateSubscription = async (req, res) => {
+  try {
+    const userId = req.params.id; // Получаем ID пользователя из URL
+    const { subscribe } = req.body; // Получаем новое значение подписки
+
+    if (typeof subscribe !== 'boolean') {
+      return res.status(400).json({ message: 'Некорректное значение подписки' });
+    }
+
+    const updates = {
+      subscribe,
+      subscribeDate: subscribe ? new Date() : null, // Обновляем дату, если подписка включена
+    };
+
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      updates,
+      { new: true } // Возвращаем обновленные данные
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: 'Пользователь не найден' });
+    }
+
+    res.json({ message: 'Подписка обновлена', user: updatedUser });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Не удалось обновить подписку' });
   }
 };
