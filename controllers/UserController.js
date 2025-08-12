@@ -22,7 +22,7 @@ export const register = async (req, res) => {
 
     const token = jwt.sign({ _id: savedUser._id }, 'secret123', { expiresIn: '30d' });
 
-    // Настройка транспортера для отправки email
+    // Настройка транспортера для отправки email 
     const transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
