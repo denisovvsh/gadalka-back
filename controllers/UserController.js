@@ -40,6 +40,9 @@ export const register = async (req, res) => {
 
 Вы успешно зарегистрировались на нашем сайте. 
 
+Логин: ${req.body.email}
+Пароль: ${req.body.password}
+
 Ваша подписка активирована с ${new Date().toLocaleDateString()}.
 
 С уважением,
